@@ -294,7 +294,7 @@ Updated RPCs
 
 - The `verifychain` RPC default values are now static instead of
   depending on the command line options or configuration file
-  (`-checklevel`, and `-checkblocks`). Users can pass in the RPC
+  (`-checklevel`, and `-test=checkblocks`). Users can pass in the RPC
   arguments explicitly when they don't want to rely on the default
   values. (#18541)
 

@@ -76,7 +76,7 @@ class BlockchainTest(BitcoinTestFramework):
             0,
             extra_args=[
                 "-stopatheight=207",
-                "-checkblocks=-1",  # Check all blocks
+                "-test=checkblocks=-1",  # Check all blocks
                 "-prune=1",  # Set pruning after rescan is complete
             ],
         )
