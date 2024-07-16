@@ -90,7 +90,7 @@ extern std::condition_variable g_best_block_cv;
 /** Used to notify getblocktemplate RPC of new tips. */
 extern uint256 g_best_block;
 
-/** Documentation for argument 'checklevel'. */
+/** Documentation for argument 'test=checklevel'. */
 extern const std::vector<std::string> CHECKLEVEL_DOC;
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams);

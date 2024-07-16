@@ -240,7 +240,7 @@ class ConfArgsTest(BitcoinTestFramework):
                 ],
                 timeout=10,
         ):
-            self.start_node(0, extra_args=['-dnsseed=1', '-fixedseeds=1', f'-mocktime={start}'])
+            self.start_node(0, extra_args=['-dnsseed=1', '-fixedseeds=1', f'-test=mocktime={start}'])
         with self.nodes[0].assert_debug_log(expected_msgs=[
                 "Adding fixed seeds as 60 seconds have passed and addrman is empty",
         ]):
@@ -282,7 +282,7 @@ class ConfArgsTest(BitcoinTestFramework):
                 ],
                 timeout=10,
         ):
-            self.start_node(0, extra_args=['-dnsseed=0', '-fixedseeds=1', '-addnode=fakenodeaddr', f'-mocktime={start}'])
+            self.start_node(0, extra_args=['-dnsseed=0', '-fixedseeds=1', '-addnode=fakenodeaddr', f'-test=mocktime={start}'])
         with self.nodes[0].assert_debug_log(expected_msgs=[
                 "Adding fixed seeds as 60 seconds have passed and addrman is empty",
         ]):
@@ -369,11 +369,12 @@ class ConfArgsTest(BitcoinTestFramework):
         node.args = node_args
 
     def test_acceptstalefeeestimates_arg_support(self):
-        self.log.info("Test -acceptstalefeeestimates option support")
+        self.log.info("Test -test=acceptstalefeeestimates option support")
         conf_file = self.nodes[0].datadir_path / "bitcoin.conf"
         for chain, chain_name in {("main", ""), ("test", "testnet3"), ("signet", "signet")}:
-            util.write_config(conf_file, n=0, chain=chain_name, extra_config='acceptstalefeeestimates=1\n')
-            self.nodes[0].assert_start_raises_init_error(expected_msg=f'Error: acceptstalefeeestimates is not supported on {chain} chain.')
+            util.write_config(conf_file, n=0, chain=chain_name, extra_config='test=acceptstalefeeestimates=1\n')
+            # -test=acceptstalefeeestimates is only supported on regtest and will return with the default error
+            self.nodes[0].assert_start_raises_init_error(expected_msg=f'Error: -test=<option> can only be used with regtest')
         util.write_config(conf_file, n=0, chain="regtest")  # Reset to regtest
 
     def run_test(self):

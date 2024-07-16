@@ -55,7 +55,7 @@ class AssumeutxoTest(BitcoinTestFramework):
         self.rpc_timeout = 120
         self.extra_args = [
             [],
-            ["-fastprune", "-prune=1", "-blockfilterindex=1", "-coinstatsindex=1"],
+            ["-test=fastprune", "-prune=1", "-blockfilterindex=1", "-coinstatsindex=1"],
             ["-persistmempool=0","-txindex=1", "-blockfilterindex=1", "-coinstatsindex=1"],
             []
         ]
@@ -412,12 +412,12 @@ class AssumeutxoTest(BitcoinTestFramework):
 
         self.log.info("Restarting node to stop at height %d", PAUSE_HEIGHT)
         self.restart_node(1, extra_args=[
-            f"-stopatheight={PAUSE_HEIGHT}", *self.extra_args[1]])
+            f"-test=stopatheight={PAUSE_HEIGHT}", *self.extra_args[1]])
 
         # Finally connect the nodes and let them sync.
         #
         # Set `wait_for_connect=False` to avoid a race between performing connection
-        # assertions and the -stopatheight tripping.
+        # assertions and the -test=stopatheight tripping.
         self.connect_nodes(0, 1, wait_for_connect=False)
 
         n1.wait_until_stopped(timeout=5)

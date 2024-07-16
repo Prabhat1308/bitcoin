@@ -684,6 +684,25 @@ std::string HelpMessageOpt(const std::string &option, const std::string &message
 
 const std::vector<std::string> TEST_OPTIONS_DOC{
     "addrman (use deterministic addrman)",
+    "fastprune (Use smaller block files and lower minimum prune height for testing purposes)",
+    "checkblocks (How many blocks to check at startup)",
+    "checklevel (How thorough the block verification is)",
+    "checkblockindex (Do a consistency check for the block tree, chainstate, and other validation data structures every <n> operations. Use 0 to disable.)",
+    "checkaddrman (Run addrman consistency checks every <n> operations. Use 0 to disable.)",
+    "checkmempool (Run mempool consistency checks every <n> transactions. Use 0 to disable.)",
+    "checkpoints Enable rejection of any forks from the known historical chain",
+    "deprecatedrpc (Allows deprecated RPC method(s) to be used)",
+    "stopafterblockimport (Stop running after importing blocks from disk )",
+    "stopatheight (Stop running after reaching the given height in the main chain)",
+    "limitancestorcount (Do not accept transactions if number of in-mempool ancestors is <n> or more)",
+    "limitancestorsize (Do not accept transactions whose size with all in-mempool ancestors exceeds <n> kilobytes)",
+    "limitdescendantcount (Do not accept transactions if any ancestor would have <n> or more in-mempool descendants)",
+    "limitdescendantsize (Do not accept transactions if any ancestor would have descendants exceeding <n> kilobytes)",
+    "capturemessages (Capture all P2P messages to disk)",
+    "mocktime (Replace actual time with <timestamp> in RPC tests)",
+    "maxtipage (Maximum tip age in seconds to consider node in initial block download)",
+    "printpriority (Log transaction fee rate per kB when mining blocks)",
+    "acceptstalefeeestimates (Read fee estimates even if they are stale)",
 };
 
 bool HasTestOption(const ArgsManager& args, const std::string& test_option)
@@ -692,6 +711,46 @@ bool HasTestOption(const ArgsManager& args, const std::string& test_option)
     return std::any_of(options.begin(), options.end(), [test_option](const auto& option) {
         return option == test_option;
     });
+}
+
+std::optional<uint64_t> GetTestOptionInt(const ArgsManager& args, const std::string& test_option)
+{
+    const auto options = args.GetArgs("-test");
+    for (const auto& option : options) {
+        if (option.find(test_option) == 0) {
+            size_t eq_index = option.find('=');
+            if (eq_index != std::string::npos) {
+                return LocaleIndependentAtoi<uint64_t>(option.substr(eq_index + 1));
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+uint64_t GetTestOptionInt(const ArgsManager& args, const std::string& test_option, uint64_t default_value)
+{
+    return GetTestOptionInt(args, test_option).value_or(default_value);
+}
+
+std::optional<bool> GetTestOptionBool(const ArgsManager& args, const std::string& test_option)
+{
+    const auto options = args.GetArgs("-test");
+    for (const auto& option : options) {
+        if (option.find(test_option) == 0) {
+            size_t eq_index = option.find('=');
+            if (eq_index != std::string::npos) {
+                return InterpretBool(option.substr(eq_index + 1));
+            } else {
+                return true;
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+bool GetTestOptionBool(const ArgsManager& args, const std::string& test_option, bool default_value)
+{
+    return GetTestOptionBool(args, test_option).value_or(default_value);
 }
 
 fs::path GetDefaultDataDir()

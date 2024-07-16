@@ -278,9 +278,9 @@ void ChainTestingSetup::LoadVerifyActivateChainstate()
     options.wipe_block_tree_db = m_args.GetBoolArg("-reindex", false);
     options.wipe_chainstate_db = m_args.GetBoolArg("-reindex", false) || m_args.GetBoolArg("-reindex-chainstate", false);
     options.prune = chainman.m_blockman.IsPruneMode();
-    options.check_blocks = m_args.GetIntArg("-checkblocks", DEFAULT_CHECKBLOCKS);
-    options.check_level = m_args.GetIntArg("-checklevel", DEFAULT_CHECKLEVEL);
-    options.require_full_verification = m_args.IsArgSet("-checkblocks") || m_args.IsArgSet("-checklevel");
+    options.check_blocks = GetTestOptionInt(m_args, "checkblocks", DEFAULT_CHECKBLOCKS);
+    options.check_level = GetTestOptionInt(m_args, "checklevel", DEFAULT_CHECKLEVEL);
+    options.require_full_verification = HasTestOption(m_args, "checkblocks") || HasTestOption(m_args, "checklevel");
     auto [status, error] = LoadChainstate(chainman, m_cache_sizes, options);
     assert(status == node::ChainstateLoadStatus::SUCCESS);
 
@@ -309,7 +309,7 @@ TestingSetup::TestingSetup(
     m_node.netgroupman = std::make_unique<NetGroupManager>(/*asmap=*/std::vector<bool>());
     m_node.addrman = std::make_unique<AddrMan>(*m_node.netgroupman,
                                                /*deterministic=*/false,
-                                               m_node.args->GetIntArg("-checkaddrman", 0));
+                                               GetTestOptionInt(*m_node.args, "checkaddrman", 0));
     m_node.banman = std::make_unique<BanMan>(m_args.GetDataDirBase() / "banlist", nullptr, DEFAULT_MISBEHAVING_BANTIME);
     m_node.connman = std::make_unique<ConnmanTestMsg>(0x1337, 0x1337, *m_node.addrman, *m_node.netgroupman, Params()); // Deterministic randomness for tests.
     PeerManager::Options peerman_opts;

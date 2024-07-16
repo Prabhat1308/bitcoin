@@ -366,7 +366,7 @@ QT_TRANSLATE_NOOP("bitcoin-core", "Transaction change output index out of range"
 QT_TRANSLATE_NOOP("bitcoin-core", "Transaction must have at least one recipient"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Transaction needs a change address, but we can't generate it."),
 QT_TRANSLATE_NOOP("bitcoin-core", "Transaction too large"),
-QT_TRANSLATE_NOOP("bitcoin-core", "Unable to allocate memory for -maxsigcachesize: '%s' MiB"),
+QT_TRANSLATE_NOOP("bitcoin-core", "Unable to allocate memory for -test=maxsigcachesize: '%s' MiB"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Unable to bind to %s on this computer (bind returned error %s)"),
 QT_TRANSLATE_NOOP("bitcoin-core", "Unable to bind to %s on this computer. %s is probably already running."),
 QT_TRANSLATE_NOOP("bitcoin-core", "Unable to create the PID file '%s': %s"),
