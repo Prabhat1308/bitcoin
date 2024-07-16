@@ -8,6 +8,8 @@
 #include <chainparamsbase.h>
 #include <common/settings.h>
 #include <logging.h>
+#include <policy/policy.h>
+#include <rpc/util.h>
 #include <sync.h>
 #include <tinyformat.h>
 #include <univalue.h>
@@ -35,8 +37,8 @@
 #include <utility>
 #include <variant>
 
-const char * const BITCOIN_CONF_FILENAME = "bitcoin.conf";
-const char * const BITCOIN_SETTINGS_FILENAME = "settings.json";
+const char* const BITCOIN_CONF_FILENAME = "bitcoin.conf";
+const char* const BITCOIN_SETTINGS_FILENAME = "settings.json";
 
 ArgsManager gArgs;
 
@@ -104,7 +106,7 @@ KeyInfo InterpretKey(std::string key)
  * by a descriptive error string
  */
 std::optional<common::SettingsValue> InterpretValue(const KeyInfo& key, const std::string* value,
-                                                  unsigned int flags, std::string& error)
+                                                    unsigned int flags, std::string& error)
 {
     // Return negated settings as false values.
     if (key.negated) {
@@ -139,10 +141,10 @@ std::set<std::string> ArgsManager::GetUnsuitableSectionOnlyArgs() const
     LOCK(cs_args);
 
     // if there's no section selected, don't worry
-    if (m_network.empty()) return std::set<std::string> {};
+    if (m_network.empty()) return std::set<std::string>{};
 
     // if it's okay to use the default section for this network, don't worry
-    if (m_network == ChainTypeToString(ChainType::MAIN)) return std::set<std::string> {};
+    if (m_network == ChainTypeToString(ChainType::MAIN)) return std::set<std::string>{};
 
     for (const auto& arg : m_network_only_args) {
         if (OnlyHasDefaultSectionSetting(m_settings, m_network, SettingName(arg))) {
@@ -164,7 +166,7 @@ std::list<SectionInfo> ArgsManager::GetUnrecognizedSections() const
 
     LOCK(cs_args);
     std::list<SectionInfo> unrecognized = m_config_sections;
-    unrecognized.remove_if([](const SectionInfo& appeared){ return available_sections.find(appeared.m_name) != available_sections.end(); });
+    unrecognized.remove_if([](const SectionInfo& appeared) { return available_sections.find(appeared.m_name) != available_sections.end(); });
     return unrecognized;
 }
 
@@ -190,7 +192,7 @@ bool ArgsManager::ParseParameters(int argc, const char* const argv[], std::strin
         if (key.substr(0, 5) == "-psn_") continue;
 #endif
 
-        if (key == "-") break; //bitcoin-tx using stdin
+        if (key == "-") break; // bitcoin-tx using stdin
         std::optional<std::string> val;
         size_t is_index = key.find('=');
         if (is_index != std::string::npos) {
@@ -361,7 +363,8 @@ std::vector<std::string> ArgsManager::GetArgs(const std::string& strArg) const
 {
     std::vector<std::string> result;
     for (const common::SettingsValue& value : GetSettingsList(strArg)) {
-        result.push_back(value.isFalse() ? "0" : value.isTrue() ? "1" : value.get_str());
+        result.push_back(value.isFalse() ? "0" : value.isTrue() ? "1" :
+                                                                  value.get_str());
     }
     return result;
 }
@@ -444,7 +447,7 @@ common::SettingsValue ArgsManager::GetPersistentSetting(const std::string& name)
 {
     LOCK(cs_args);
     return common::GetSetting(m_settings, m_network, name, !UseDefaultSection("-" + name),
-        /*ignore_nonpersistent=*/true, /*get_chain_type=*/false);
+                              /*ignore_nonpersistent=*/true, /*get_chain_type=*/false);
 }
 
 bool ArgsManager::IsArgNegated(const std::string& strArg) const
@@ -594,48 +597,48 @@ std::string ArgsManager::GetHelpMessage() const
     std::string usage;
     LOCK(cs_args);
     for (const auto& arg_map : m_available_args) {
-        switch(arg_map.first) {
-            case OptionsCategory::OPTIONS:
-                usage += HelpMessageGroup("Options:");
-                break;
-            case OptionsCategory::CONNECTION:
-                usage += HelpMessageGroup("Connection options:");
-                break;
-            case OptionsCategory::ZMQ:
-                usage += HelpMessageGroup("ZeroMQ notification options:");
-                break;
-            case OptionsCategory::DEBUG_TEST:
-                usage += HelpMessageGroup("Debugging/Testing options:");
-                break;
-            case OptionsCategory::NODE_RELAY:
-                usage += HelpMessageGroup("Node relay options:");
-                break;
-            case OptionsCategory::BLOCK_CREATION:
-                usage += HelpMessageGroup("Block creation options:");
-                break;
-            case OptionsCategory::RPC:
-                usage += HelpMessageGroup("RPC server options:");
-                break;
-            case OptionsCategory::WALLET:
-                usage += HelpMessageGroup("Wallet options:");
-                break;
-            case OptionsCategory::WALLET_DEBUG_TEST:
-                if (show_debug) usage += HelpMessageGroup("Wallet debugging/testing options:");
-                break;
-            case OptionsCategory::CHAINPARAMS:
-                usage += HelpMessageGroup("Chain selection options:");
-                break;
-            case OptionsCategory::GUI:
-                usage += HelpMessageGroup("UI Options:");
-                break;
-            case OptionsCategory::COMMANDS:
-                usage += HelpMessageGroup("Commands:");
-                break;
-            case OptionsCategory::REGISTER_COMMANDS:
-                usage += HelpMessageGroup("Register Commands:");
-                break;
-            default:
-                break;
+        switch (arg_map.first) {
+        case OptionsCategory::OPTIONS:
+            usage += HelpMessageGroup("Options:");
+            break;
+        case OptionsCategory::CONNECTION:
+            usage += HelpMessageGroup("Connection options:");
+            break;
+        case OptionsCategory::ZMQ:
+            usage += HelpMessageGroup("ZeroMQ notification options:");
+            break;
+        case OptionsCategory::DEBUG_TEST:
+            usage += HelpMessageGroup("Debugging/Testing options:");
+            break;
+        case OptionsCategory::NODE_RELAY:
+            usage += HelpMessageGroup("Node relay options:");
+            break;
+        case OptionsCategory::BLOCK_CREATION:
+            usage += HelpMessageGroup("Block creation options:");
+            break;
+        case OptionsCategory::RPC:
+            usage += HelpMessageGroup("RPC server options:");
+            break;
+        case OptionsCategory::WALLET:
+            usage += HelpMessageGroup("Wallet options:");
+            break;
+        case OptionsCategory::WALLET_DEBUG_TEST:
+            if (show_debug) usage += HelpMessageGroup("Wallet debugging/testing options:");
+            break;
+        case OptionsCategory::CHAINPARAMS:
+            usage += HelpMessageGroup("Chain selection options:");
+            break;
+        case OptionsCategory::GUI:
+            usage += HelpMessageGroup("UI Options:");
+            break;
+        case OptionsCategory::COMMANDS:
+            usage += HelpMessageGroup("Commands:");
+            break;
+        case OptionsCategory::REGISTER_COMMANDS:
+            usage += HelpMessageGroup("Register Commands:");
+            break;
+        default:
+            break;
         }
 
         // When we get to the hidden options, stop
@@ -671,19 +674,41 @@ static const int screenWidth = 79;
 static const int optIndent = 2;
 static const int msgIndent = 7;
 
-std::string HelpMessageGroup(const std::string &message) {
+std::string HelpMessageGroup(const std::string& message)
+{
     return std::string(message) + std::string("\n\n");
 }
 
-std::string HelpMessageOpt(const std::string &option, const std::string &message) {
-    return std::string(optIndent,' ') + std::string(option) +
-           std::string("\n") + std::string(msgIndent,' ') +
+std::string HelpMessageOpt(const std::string& option, const std::string& message)
+{
+    return std::string(optIndent, ' ') + std::string(option) +
+           std::string("\n") + std::string(msgIndent, ' ') +
            FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
            std::string("\n\n");
 }
 
 const std::vector<std::string> TEST_OPTIONS_DOC{
     "addrman (use deterministic addrman)",
+    "fastprune (Use smaller block files and lower minimum prune height for testing purposes)",
+    "checkblocks=<n> (How many blocks to check at startup (default: DEFAULT_CHECKBLOCKS, 0 = all))",
+    "checklevel=<n> (How thorough the block verification of -checkblocks is (0-4, default: DEFAULT_CHECKLEVEL))",
+    "checkblockindex (Do a consistency check for the block tree, chainstate, and other validation data structures every <n> operations. Use 0 to disable.)",
+    "checkaddrman=<n> (Run addrman consistency checks every <n> operations. Use 0 to disable. (default: DEFAULT_ADDRMAN_CONSISTENCY_CHECKS))",
+    "checkmempool=<n> (Run mempool consistency checks every <n> transactions. Use 0 to disable.)",
+    "checkpoints (Enable rejection of any forks from the known historical chain until block X)",
+    "deprecatedrpc=<method> (Allows deprecated RPC method(s) to be used)",
+    "stopafterblockimport (Stop running after importing blocks from disk (default: DEFAULT_STOPAFTERBLOCKIMPORT ))",
+    "stopatheight (Stop running after reaching the given height in the main chain (default: DEFAULT_STOPATHEIGHT))",
+    "limitancestorcount=<n> (Do not accept transactions if number of in-mempool ancestors is <n> or more (default: DEFAULT_ANCESTOR_LIMIT))",
+    "limitancestorsize=<n> (Do not accept transactions whose size with all in-mempool ancestors exceeds <n> kilobytes (default: DEFAULT_ANCESTOR_SIZE_LIMIT_KVB))",
+    "limitdescendantcount=<n> (Do not accept transactions if any ancestor would have <n> or more in-mempool descendants (default: DEFAULT_DESCENDANT_LIMIT))",
+    "limitdescendantsize=<n> (Do not accept transactions if any ancestor would have more than <n> kilobytes of in-mempool descendants (default: DEFAULT_DESCENDANT_SIZE_LIMIT_KVB)",
+    "capturemessages (Capture all P2P messages to disk)",
+    "mocktime=<n> (Replace actual time with " + UNIX_EPOCH_TIME + " (default: 0))",
+    "maxsigcachesize=<n> (Limit sum of signature cache and script execution cache sizes to <n> MiB (default: DEFAULT_VALIDATION_CACHE_BYTES >> 20))",
+    "maxtipage=<n> (Maximum tip age in seconds to consider node in initial block download )",
+    "printpriority (Log transaction fee rate in " + CURRENCY_UNIT + "/kvB when mining blocks (default: DEFAULT_PRINT_MODIFIED_FEE))",
+    "acceptstalefeeestimates (Read fee estimates even if they are stale (default: %u) fee estimates are considered stale if they are X hours old (regtest only) )",
 };
 
 bool HasTestOption(const ArgsManager& args, const std::string& test_option)
@@ -764,14 +789,15 @@ std::variant<ChainType, std::string> ArgsManager::GetChainArg() const
     auto get_net = [&](const std::string& arg) {
         LOCK(cs_args);
         common::SettingsValue value = common::GetSetting(m_settings, /* section= */ "", SettingName(arg),
-            /* ignore_default_section_config= */ false,
-            /*ignore_nonpersistent=*/false,
-            /* get_chain_type= */ true);
-        return value.isNull() ? false : value.isBool() ? value.get_bool() : InterpretBool(value.get_str());
+                                                         /* ignore_default_section_config= */ false,
+                                                         /*ignore_nonpersistent=*/false,
+                                                         /* get_chain_type= */ true);
+        return value.isNull() ? false : value.isBool() ? value.get_bool() :
+                                                         InterpretBool(value.get_str());
     };
 
     const bool fRegTest = get_net("-regtest");
-    const bool fSigNet  = get_net("-signet");
+    const bool fSigNet = get_net("-signet");
     const bool fTestNet = get_net("-testnet");
     const auto chain_arg = GetArg("-chain");
 
