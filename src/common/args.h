@@ -472,6 +472,7 @@ std::optional<uint64_t> GetTestOptionInt(const ArgsManager& args, const std::str
 bool GetTestOptionBool(const ArgsManager& args, const std::string& test_option, bool default_value);
 std::optional<bool> GetTestOptionBool(const ArgsManager& args, const std::string& test_option);
 
+std::optional<std::string> GetTestOptionString(const ArgsManager& args, const std::string& test_option);
 
 /**
  * Format a string to be used as group of options in help messages

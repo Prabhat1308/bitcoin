@@ -748,6 +748,20 @@ std::optional<bool> GetTestOptionBool(const ArgsManager& args, const std::string
     return std::nullopt;
 }
 
+std::optional<std::string> GetTestOptionString(const ArgsManager& args, const std::string& test_option)
+{
+    const auto options = args.GetArgs("-test");
+    for (const auto& option : options) {
+        if (option.find(test_option) == 0) {
+            size_t eq_index = option.find('=');
+            if (eq_index != std::string::npos) {
+                return option.substr(eq_index + 1);
+            }
+        }
+    }
+    return std::nullopt;
+}
+
 bool GetTestOptionBool(const ArgsManager& args, const std::string& test_option, bool default_value)
 {
     return GetTestOptionBool(args, test_option).value_or(default_value);
