@@ -20,8 +20,7 @@
 #include <numeric>
 #include <utility>
 
-// FROM THE FUZZ TEST
-constexpr size_t MAX_CLUSTER_COUNT = 500;
+static constexpr unsigned MAX_CLUSTER_COUNT{64}; // Must be <= MAX_CLUSTER_COUNT_LIMIT
 
 namespace node {
 
@@ -351,11 +350,10 @@ std::map<COutPoint, CAmount> MiniMiner::CalculateBumpFees(const CFeeRate& target
         
         // Get ancestor set using TxGraph
         auto ancestors = m_txgraph->GetAncestors(tx_ref);
-        if (ancestors.empty()) continue;
         
-        // Calculate ancestor set totals
-        int64_t ancestor_set_size = 0;
-        CAmount ancestor_set_fee = 0;
+        // Calculate ancestor set totals (including the transaction itself)
+        int64_t ancestor_set_size = individual_size;
+        CAmount ancestor_set_fee = individual_fee;
         
         for (auto* ancestor_ref : ancestors) {
             auto ancestor_feerate = m_txgraph->GetIndividualFeerate(*ancestor_ref);
